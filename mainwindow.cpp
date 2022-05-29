@@ -7,16 +7,18 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     a = b = c = "";       // устанавливаем "пустые" строки
+    ui->radioButton->setChecked(true);
+    is_degree = true;
 }
 
 void MainWindow::Prepare_String(QLineEdit *le) {
     QString str = le->text();
-    QString tmpl = "^[\\+|\\-]?\\d*$";     // проверяем на цыфры
+    QString tmpl = "^[\\+|\\-]?\\d*([\\.|,]?\\d*)$";     // проверяем на цыфры, в т.ч. и вещественные
     QRegExp *q = new QRegExp(tmpl);
 
     if (!str.isEmpty()) {
         if (q->indexIn(str) != -1) {
-            str = str.left(3);               // усекаем длину строки до 3
+            str = str.left(10);               // усекаем длину строки до 10
             le->setText(str);
         }
         else {
@@ -45,15 +47,15 @@ void MainWindow::Calculate() {
     c = ui->lineEdit_3->text();
 
     if (a.length() < 1) {
-        QMessageBox::information(this, tr("Не введён параметр!!!"), tr("Необходимо ввести параметр a !"));
+        QMessageBox::information(this, tr("Не введён параметр!!!"), tr("Необходимо ввести параметр !"));
         return;
     }
     if (b.length() < 1) {
-        QMessageBox::information(this, tr("Не введён параметр!!!"), tr("Необходимо ввести параметр b !"));
+        QMessageBox::information(this, tr("Не введён параметр!!!"), tr("Необходимо ввести параметр !"));
         return;
     }
     if (c.length() < 1) {
-        QMessageBox::information(this, tr("Не введён параметр!!!"), tr("Необходимо ввести параметр c !"));
+        QMessageBox::information(this, tr("Не введён параметр!!!"), tr("Необходимо ввести параметр !"));
         return;
     }
 
@@ -63,37 +65,24 @@ void MainWindow::Calculate() {
 
     bool ok;
     double aa = a.toDouble(&ok);
-    if (ok && aa == 0) {
-        QMessageBox::information(this, tr("Неверный параметр!!!"), tr("a не должен быть равен 0 !"));
-        return;
-    }
     ERROR_1
     double bb = b.toDouble(&ok);
     ERROR_1
     double cc = c.toDouble(&ok);
     ERROR_1
 
-    double D = qPow (bb, 2.0);
-    D -= 4.0 * aa * cc;
+    double angle = cc;
+    if (is_degree)                        // если установлены градусы
+        angle = angle * 3.1416 / 180.0;   // то переводим градусы в радианы
+
+    double side = qSqrt(qPow (aa, 2.0) + qPow (bb, 2.0) - 2.0 * aa * bb * qCos(angle));
 
 #define  MESSAGE_1  QMessageBox msgBox;\
                     msgBox.setText(str);\
                     msgBox.exec();
 
-    if (D > 0) {
-        double R1 = (-bb + qSqrt(D)) / (2.0 * aa);
-        double R2 = (-bb - qSqrt(D)) / (2.0 * aa);
-        QString str = "Имеется два корня:  " + QString::number(R1) + "  и  " + QString::number(R2);
-        MESSAGE_1
-    }
-    if (D == 0) {
-        QString str = "Имеется единственный корень:  " + QString::number(-bb / (2.0 * aa));
-        MESSAGE_1
-    }
-    if (D < 0) {
-        QString str = "Уравнение не имеет действительных корней";
-        MESSAGE_1
-    }
+    QString str = "Третья сторона равна:  " + QString::number(side);
+    MESSAGE_1
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -101,10 +90,23 @@ void MainWindow::on_pushButton_clicked()
     Calculate();
 }
 
+void MainWindow::on_radioButton_clicked()   // "переключатель"   градусы <-> радианы  по нажатию на радиобаттон
+{
+    if (is_degree == true) {
+        is_degree = false;
+        ui->radioButton->setText("радианы");
+    } else {
+        is_degree = true;
+        ui->radioButton->setText("градусы");
+    }
+}
+
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+
 
 
 

@@ -19,7 +19,7 @@ FORMS += \
     mainwindow.ui
 
 TRANSLATIONS += \
-    my2_ru_RU.ts
+    my3_ru_RU.ts
 CONFIG += lrelease
 CONFIG += embed_translations
 

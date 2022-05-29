@@ -23,9 +23,11 @@ private slots:
     void on_lineEdit_3_textChanged(const QString &arg1);
     void Calculate();
     void on_pushButton_clicked();
+    void on_radioButton_clicked();
 
 private:
     QString a, b, c;
+    bool is_degree;        // true - градусы
     Ui::MainWindow *ui;
     QLineEdit *lineEdit;
 };
