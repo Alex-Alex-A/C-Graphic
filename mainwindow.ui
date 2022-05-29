@@ -6,107 +6,79 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>501</width>
-    <height>254</height>
+    <width>812</width>
+    <height>530</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="label">
+   <widget class="QPlainTextEdit" name="plainTextEdit">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>40</y>
-      <width>111</width>
-      <height>31</height>
+      <x>20</x>
+      <y>20</y>
+      <width>281</width>
+      <height>201</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Введите сторону A:</string>
+    <property name="plainText">
+     <string>Гляжу, поднимается медленно в гору
+Лошадка, везущая хворосту воз.</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit">
+   <widget class="QPlainTextEdit" name="plainTextEdit_2">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>40</y>
-      <width>113</width>
-      <height>22</height>
+      <x>20</x>
+      <y>230</y>
+      <width>281</width>
+      <height>221</height>
      </rect>
     </property>
+    <property name="plainText">
+     <string>Однажды, в студёную зимнюю пору
+Я из лесу вышел; был сильный мороз.</string>
+    </property>
    </widget>
-   <widget class="QLabel" name="label_2">
+   <widget class="QPushButton" name="pushButton_add">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>390</x>
       <y>90</y>
-      <width>111</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Введите сторону B:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>140</y>
-      <width>81</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Введите угол:</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_2">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>90</y>
-      <width>113</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_3">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>140</y>
-      <width>113</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>230</x>
-      <y>180</y>
       <width>75</width>
       <height>24</height>
      </rect>
     </property>
     <property name="text">
-     <string>Рассчитать</string>
+     <string>Добавить</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton">
+   <widget class="QPushButton" name="pushButton_replace">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>140</y>
-      <width>89</width>
-      <height>20</height>
+      <x>390</x>
+      <y>130</y>
+      <width>75</width>
+      <height>24</height>
      </rect>
     </property>
     <property name="text">
-     <string>градусы</string>
+     <string>Заменить</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_add_html">
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>170</y>
+      <width>91</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Добавить html</string>
     </property>
    </widget>
   </widget>
@@ -115,7 +87,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>501</width>
+     <width>812</width>
      <height>22</height>
     </rect>
    </property>

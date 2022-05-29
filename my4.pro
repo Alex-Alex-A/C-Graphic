@@ -19,11 +19,12 @@ FORMS += \
     mainwindow.ui
 
 TRANSLATIONS += \
-    my3_ru_RU.ts
+    my4_ru_RU.ts
 CONFIG += lrelease
 CONFIG += embed_translations
 
 # Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
+#qnx: target.path = /tmp/$${TARGET}/bin
+#else: unix:!android: target.path = /opt/$${TARGET}/bin
+#!isEmpty(target.path): INSTALLS += target
+target.path = /build

@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <QtWidgets>
+#include <QFile>
+#include <QFileInfo>
+#include <QTextEdit>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,18 +20,11 @@ public:
     ~MainWindow();
 
 private slots:
-    void Prepare_String(QLineEdit*);
-    void on_lineEdit_textChanged(const QString &arg1);
-    void on_lineEdit_2_textChanged(const QString &arg1);
-    void on_lineEdit_3_textChanged(const QString &arg1);
-    void Calculate();
-    void on_pushButton_clicked();
-    void on_radioButton_clicked();
+    void on_pushButton_add_clicked();
+    void on_pushButton_replace_clicked();
+    void on_pushButton_add_html_clicked();
 
 private:
-    QString a, b, c;
-    bool is_degree;        // true - градусы
     Ui::MainWindow *ui;
-    QLineEdit *lineEdit;
 };
 #endif // MAINWINDOW_H
