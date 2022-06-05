@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
         }
     }
     MainWindow w;
-    w.setWindowTitle("Авто-замена в тексте (нажмите любую клавишу)");
+    w.setWindowTitle("Операции с таблицей");
     w.show();
     return a.exec();
 }
