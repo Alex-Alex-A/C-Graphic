@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+ #include "mainwindow.h"
 
 #include <QApplication>
 #include <QLocale>
@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
         }
     }
     MainWindow w;
-    w.setWindowTitle("Операции с таблицей");
+    w.setWindowTitle("Меню");
     w.show();
     return a.exec();
 }

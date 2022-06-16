@@ -1,4 +1,6 @@
-QT       += core gui
+QT       +=  core gui
+#QT       +=  qml
+#QT       +=  webengine
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -19,7 +21,7 @@ FORMS += \
     mainwindow.ui
 
 TRANSLATIONS += \
-    ur2_z2_ru_RU.ts
+    parse_html_ru_RU.ts
 CONFIG += lrelease
 CONFIG += embed_translations
 

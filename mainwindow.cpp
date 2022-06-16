@@ -1,6 +1,27 @@
-#include <QPainter>
-#include <QDebug>
-#include <QStandardItemModel>
+#include <QAction>
+#include <QApplication>
+#include <QClipboard>
+#include <QColorDialog>
+#include <QComboBox>
+#include <QFontComboBox>
+#include <QFile>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QFontDatabase>
+#include <QMenu>
+#include <QMenuBar>
+#include <QTextCodec>
+#include <QTextEdit>
+#include <QStatusBar>
+#include <QToolBar>
+#include <QTextCursor>
+#include <QTextDocumentWriter>
+#include <QTextList>
+#include <QtDebug>
+#include <QCloseEvent>
+#include <QMessageBox>
+#include <QMimeData>
+#include <QMimeDatabase>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -11,132 +32,123 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    row_index = -1;
+    mainMenu = this->menuBar();
 
-    model = new QStandardItemModel(ui->tableView);
-    model->setHorizontalHeaderLabels(QStringList() << "Prorgamming Language" << "Icon");
+    fMenu = mainMenu->addMenu("Файл");
+    aMenu = mainMenu->addMenu("Справка");
 
-    plg1 = new PLanguage(0, "C++", "./img/c++.png", model);
-    plg2 = new PLanguage(1, "C##", "./img/c#.png", model);
-    plg3 = new PLanguage(2, "java", "./img/java.png", model);
-    plg4 = new PLanguage(3, "js", "./img/js.png", model);
-    plg5 = new PLanguage(4, "php", "./img/php.png", model);
-    plg6 = new PLanguage(5, "python", "./img/python.png", model);
+    openfile = new QAction(tr("&Открыть"), this);
+    openfile->setShortcuts(QKeySequence::Open);
+    connect(openfile, &QAction::triggered, this, &MainWindow::fileOpen);
+    fMenu->addAction(openfile);
 
-    ui->tableView->setModel(model);
-    ui->tableView->resizeColumnsToContents();
-    ui->tableView->resizeRowsToContents();
+    saveasfile = new QAction(tr("&Сохранить как"), this);
+    saveasfile->setShortcuts(QKeySequence::SaveAs);
+    connect(saveasfile, &QAction::triggered, this, &MainWindow::fileSaveAs);
+    fMenu->addAction(saveasfile);
+
+    about = new QAction(tr("&О программе"), this);
+    connect(about, &QAction::triggered, this, &MainWindow::About);
+    aMenu->addAction(about);
 }
+
+
+void MainWindow::fileOpen() {
+
+    QFileDialog fileDialog(this, "Open File...");
+    fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
+    fileDialog.setFileMode(QFileDialog::ExistingFile);
+    fileDialog.setMimeTypeFilters(QStringList()
+                                  << "text/plain");
+
+    if (fileDialog.exec() != QDialog::Accepted)
+        return;
+    const QString fn = fileDialog.selectedFiles().first();
+
+    Parse_File (fn);  // отправляем полученный полный путь к файлу для открытия и парсинга
+}
+
+void MainWindow::fileSaveAs() {
+
+    QFileDialog fileDialog(this, tr("Save as..."));
+    fileDialog.setAcceptMode(QFileDialog::AcceptSave);
+    QStringList mimeTypes;
+    mimeTypes << "text/plain";
+    fileDialog.setMimeTypeFilters(mimeTypes);
+    if (fileDialog.exec() != QDialog::Accepted)
+        return;
+
+    const QString fn = fileDialog.selectedFiles().first();
+}
+
+void MainWindow::Parse_File (const QString& fn) {  // открываем и парсим html-файл сайта mail.ru
+
+    QString outstr = "", common_str = "";
+    QFile file(fn);
+    if (file.open(QIODevice::ReadOnly)) {
+        QString str(file.readAll());
+
+        QRegExp rx("\"now\":\\{(.*)\"near\"");    // шаблон для поиска блока погоды в html
+        int pos = 0;
+        while ((pos = rx.indexIn(str, pos)) != -1) {
+            outstr = rx.cap(1);                       // в outstr блок, содержащий данные о погоде
+            pos += rx.matchedLength();
+        }
+
+        QRegularExpression rx_t("\"temp\":\"(.*?)\"");              // шаблон для поиска температуры
+        QRegularExpressionMatch match = rx_t.match(outstr);
+        if (match.hasMatch())
+            common_str += "Температура: " + match.captured(1) + "\n";
+
+        QRegularExpression rx_d("\"description\":\"(.*?)\"");       // шаблон для поиска общего описания
+        match = rx_d.match(outstr);
+        if (match.hasMatch())
+            common_str += match.captured(1) + "\n";
+
+        QRegularExpression rx_w("\"wind_description\":\"(.*?)\"");  // шаблон для поиска ветра
+        match = rx_w.match(outstr);
+        if (match.hasMatch())
+            common_str += match.captured(1) + "\n";
+
+        QRegularExpression rx_p("\"pressure\":\"(.*?)\"");          // шаблон для поиска атм. давления
+        match = rx_p.match(outstr);
+        if (match.hasMatch())
+            common_str += "Атмосферное давление: " + match.captured(1) + "\n";
+
+        QRegularExpression rx_currency("<div class=\"rate__currency svelte-19b6xeo\">(.*?)</div>");    // шаблон для поиска фрагмента курса доллара
+        match = rx_currency.match(str);
+        if (match.hasMatch())
+            common_str += "Курс доллара: " + match.captured(1) + "\n";
+
+        QMessageBox::information(NULL, "Погода и прочее:", common_str);
+    }
+    else
+        QMessageBox::information(NULL, tr("Ошибка!"), tr("Файл не существует!"));
+}
+
+void MainWindow::About()
+{
+    QFile abouttxt(":about");  // читаем текст из "about.txt", ссылка на который в "textedit.qrc"
+
+    if (!abouttxt.open(QIODevice::ReadOnly | QIODevice::Text))
+        QMessageBox::information(this, tr("Ошибка!!!"), tr("Не получается прочитать данные из ресурса"));
+
+    else {
+        QString s = "";
+        QTextStream in(&abouttxt);
+        while (!in.atEnd()) {
+            QString line = in.readLine();
+            s += line;
+        }
+        QMessageBox::information(this, tr("О программе из ресурса:"), s);
+    }
+}
+
 
 MainWindow::~MainWindow()
 {
-    delete plg1;
-    delete plg2;
-    delete plg3;
-    delete plg4;
-    delete plg5;
-    delete plg6;
     delete ui;
 }
-
-void MainWindow::on_pushButton1_UP_clicked()
-{
-}
-
-void MainWindow::on_pushButton1_DOWN_clicked()
-{
-    QList<QStandardItem*> itemUP = model->takeRow( 0 );
-    model->insertRow( 1, itemUP );
-    ui->tableView->resizeRowsToContents();
-}
-
-void MainWindow::on_pushButton2_UP_clicked()
-{
-    QList<QStandardItem*> itemUP = model->takeRow( 1 );
-    model->insertRow( 0, itemUP );
-    ui->tableView->resizeRowsToContents();
-}
-
-void MainWindow::on_pushButton2_DOWN_clicked()
-{
-    QList<QStandardItem*> itemUP = model->takeRow( 1 );
-    model->insertRow( 2, itemUP );
-    ui->tableView->resizeRowsToContents();
-}
-
-void MainWindow::on_pushButton3_UP_clicked()
-{
-    QList<QStandardItem*> itemUP = model->takeRow( 2 );
-    model->insertRow( 1, itemUP );
-    ui->tableView->resizeRowsToContents();
-}
-
-void MainWindow::on_pushButton3_DOWN_clicked()
-{
-    QList<QStandardItem*> itemUP = model->takeRow( 2 );
-    model->insertRow( 3, itemUP );
-    ui->tableView->resizeRowsToContents();
-}
-
-void MainWindow::on_pushButton4_UP_clicked()
-{
-    QList<QStandardItem*> itemUP = model->takeRow( 3 );
-    model->insertRow( 2, itemUP );
-    ui->tableView->resizeRowsToContents();
-}
-
-void MainWindow::on_pushButton4_DOWN_clicked()
-{
-    QList<QStandardItem*> itemUP = model->takeRow( 3 );
-    model->insertRow( 4, itemUP );
-    ui->tableView->resizeRowsToContents();
-}
-
-void MainWindow::on_pushButton5_UP_clicked()
-{
-    QList<QStandardItem*> itemUP = model->takeRow( 4 );
-    model->insertRow( 3, itemUP );
-    ui->tableView->resizeRowsToContents();
-}
-
-void MainWindow::on_pushButton5_DOWN_clicked()
-{
-    QList<QStandardItem*> itemUP = model->takeRow( 4 );
-    model->insertRow( 5, itemUP );
-    ui->tableView->resizeRowsToContents();
-}
-
-void MainWindow::on_pushButton6_UP_clicked()
-{
-    QList<QStandardItem*> itemUP = model->takeRow( 5 );
-    model->insertRow( 4, itemUP );
-    ui->tableView->resizeRowsToContents();
-}
-
-void MainWindow::on_pushButton6_DOWN_clicked()    {}
-
-void MainWindow::on_tableView_pressed(const QModelIndex &index)
-{
-    row_index = index.row();  // получаем номер выделенной строки
-}
-
-void MainWindow::on_pushButton_Rem_Row_clicked()
-{
-    if (row_index != -1) {                     // если выделен хотя бы одна строка
-        model->removeRow( row_index );
-        ui->tableView->resizeRowsToContents();
-        row_index = -1;                        // ставим в -1, чтоб исключить случайные удаления
-    }
-}
-
-void MainWindow::on_checkBox_stateChanged(int arg1)
-{
-    if (arg1 == 1) {
-        //QListView::setViewMode(QListView::IconMode);
-    }
-}
-
-
 
 
 
