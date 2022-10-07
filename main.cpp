@@ -1,24 +1,18 @@
- #include "mainwindow.h"
+ #include <QApplication>
 
-#include <QApplication>
-#include <QLocale>
-#include <QTranslator>
+ #include "window.h"
 
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
+ int main(int argc, char *argv[])
+ {
+     QApplication app(argc, argv);
+     Window window;
+     window.setMinimumWidth(640);
+     window.setMinimumHeight(480);
 
-    QTranslator translator;
-    const QStringList uiLanguages = QLocale::system().uiLanguages();
-    for (const QString &locale : uiLanguages) {
-        const QString baseName = "my2_" + QLocale(locale).name();
-        if (translator.load(":/i18n/" + baseName)) {
-            a.installTranslator(&translator);
-            break;
-        }
-    }
-    MainWindow w;
-    w.setWindowTitle("Меню");
-    w.show();
-    return a.exec();
-}
+     QPalette palette(window.palette());
+     palette.setColor(QPalette::Window, QColor(228, 236, 239, 255));
+     window.setPalette(palette);
+
+     window.show();
+     return app.exec();
+ }
